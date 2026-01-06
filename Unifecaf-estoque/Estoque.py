@@ -30,7 +30,6 @@ def carregar_dados():
         except:
             return []
     
-    # Lista inicial padrão com os 5 produtos solicitados
     print(f"{AZUL}Iniciando sistema com estoque padrão...{RESET}")
     produtos_iniciais = [
         {"nome": "Teclado", "preco": 75.00, "quantidade": 25},
@@ -42,11 +41,9 @@ def carregar_dados():
     salvar_dados(produtos_iniciais)
     return produtos_iniciais
 
-# Inicializa o estoque
 estoque = carregar_dados()
 
 while True:
-    # Menu com NEGRITO aplicado
     print(f"\n{NEGRITO}========= MENU DE CONTROLE DE ESTOQUE ========={RESET}")
     print(f"{NEGRITO}1 - Adicionar Produto{RESET}")
     print(f"{NEGRITO}2 - Atualizar Produto{RESET}")
@@ -75,17 +72,19 @@ while True:
         encontrado = False
         for produto in estoque:
             if produto["nome"].lower() == busca.lower():
-                try:
-                    produto["preco"] = float(input("Novo preço: "))
-                    produto["quantidade"] = int(input("Nova quantidade: "))
-                    salvar_dados(estoque)
-                    print(f"{VERDE}Dados atualizados!{RESET}")
-                    encontrado = True
-                    break
-                except ValueError:
-                    print(f"{VERMELHO}Erro: Valor inválido.{RESET}")
-                    encontrado = True
-                    break
+                encontrado = True
+                confirmar = input(f"{VERMELHO}{NEGRITO}Tem certeza que deseja atualizar esse item? (s/n): {RESET}").lower()
+                if confirmar == 's':
+                    try:
+                        produto["preco"] = float(input("Novo preço: "))
+                        produto["quantidade"] = int(input("Nova quantidade: "))
+                        salvar_dados(estoque)
+                        print(f"{VERDE}Dados atualizados!{RESET}")
+                    except ValueError:
+                        print(f"{VERMELHO}Erro: Valor inválido.{RESET}")
+                else:
+                    print(f"{AZUL}Atualização cancelada.{RESET}")
+                break
         if not encontrado:
             print(f"{VERMELHO}Erro: Produto não encontrado.{RESET}")
 
@@ -95,10 +94,14 @@ while True:
         encontrado = False
         for i in range(len(estoque)):
             if estoque[i]["nome"].lower() == busca.lower():
-                removido = estoque.pop(i)
-                salvar_dados(estoque)
-                print(f"{VERDE}Produto '{removido['nome']}' removido!{RESET}")
                 encontrado = True
+                confirmar = input(f"{VERMELHO}{NEGRITO}Tem certeza que deseja excluir este item? (s/n): {RESET}").lower()
+                if confirmar == 's':
+                    removido = estoque.pop(i)
+                    salvar_dados(estoque)
+                    print(f"{VERDE}Produto '{removido['nome']}' removido!{RESET}")
+                else:
+                    print(f"{AZUL}Exclusão cancelada.{RESET}")
                 break
         if not encontrado:
             print(f"{VERMELHO}Erro: Produto não localizado.{RESET}")
@@ -110,26 +113,28 @@ while True:
         else:
             total_qtd = 0
             valor_geral = 0
-            # Tabela em Azul e Negrito no cabeçalho
             print(f"{NEGRITO}{AZUL}{'Nome':<15} | {'Preço':<10} | {'Qtd':<5} | {'Subtotal':<12}{RESET}")
-            print(f"{AZUL}" + "-" * 55 + f"{RESET}")
-            
+            print(f"{AZUL}" + "-" * 60 + f"{RESET}")
             for p in estoque:
                 subtotal = p['preco'] * p['quantidade']
                 print(f"{AZUL}{p['nome']:<15} | R$ {p['preco']:>7.2f} | {p['quantidade']:>5} | R$ {subtotal:>9.2f}{RESET}")
                 total_qtd += p['quantidade']
                 valor_geral += subtotal
-            
-            print(f"{AZUL}" + "-" * 55 + f"{RESET}")
+            print(f"{AZUL}" + "-" * 60 + f"{RESET}")
             print(f"{NEGRITO}{CIANO}RESUMO FINANCEIRO TOTAL:{RESET}")
             print(f"Quantidade total de itens: {total_qtd}")
             print(f"Patrimônio total em estoque: {VERDE}{NEGRITO}R$ {valor_geral:,.2f}{RESET}")
 
     elif opcao == '5':
-        salvar_dados(estoque)
-        print(f"{NEGRITO}Encerrando o sistema... Até logo!{RESET}")
-        break
+        confirmar_sair = input(f"{VERMELHO}{NEGRITO}Tem certeza que deseja sair do Sistema? (s/n): {RESET}").lower()
+        if confirmar_sair == 's':
+            salvar_dados(estoque)
+            print(f"{NEGRITO}Encerrando o sistema... Até logo!{RESET}")
+            break
+        else:
+            print(f"{AZUL}Permanecendo no sistema.{RESET}")
     
     else:
         print(f"{VERMELHO}Erro: Opção inválida.{RESET}")
-
+        busca = input("Nome do produto para atualizar: ")
+        encontrado = False
